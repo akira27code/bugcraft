@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>БАГОКРАФТ: ПЕРЕРОЖДЕНИЕ v3.2</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Главный экран -->
+    <div id="mainMenu" class="main-menu">
+        <div class="game-title">БАГОКРАФТ</div>
+        <div class="game-version">ПЕРЕРОЖДЕНИЕ v3.2</div>
+        <div class="game-subtitle">
+            ⚔️ Эпическая битва с багами в подземельях!<br>
+            👑 Сражайся с боссами и собирай артефакты!
+        </div>
+        <div class="features-list">
+            <span>🎯</span> Кликай по врагам, чтобы уничтожить их<br>
+            <span>🎁</span> Собирай мощные артефакты<br>
+            <span>👑</span> Убивай боссов ради редких реликвий<br>
+            <span>🎰</span> Крути слот-машину за легендарные предметы<br>
+            <span>💣</span> Используй ядерку в крайнем случае!<br>
+            <span>⚡</span> Проходи волны и стадии сложности
+        </div>
+        <button class="start-button" onclick="startGame()">⚔️ НАЧАТЬ ИГРУ ⚔️</button>
+    </div>
+
+    <!-- Игровой контейнер -->
+    <div id="gameContainer" class="game-wrapper hidden">
+        <div class="game-container">
+            <div class="grid" id="gameGrid"></div>
+            <div style="display:flex;gap:6px;margin-top:8px;">
+                <button id="resetBtn">💀 В МЕНЮ</button>
+                <button id="startWaveBtn" style="background:#22aa22;">⚔️ СТАРТ ВОЛНУ</button>
+                <button id="nukeBtn" style="background:#ff2200;">💣 ЯДЕРКА (<span id="nukeCount">1</span>)</button>
+            </div>
+        </div>
+        
+        <div class="panel">
+            <div class="stat">🐞 ОЧКИ: <span id="score">500</span></div>
+            <div class="stat">📊 СТАДИЯ: <span id="stageDisplay" class="stage-indicator">1 - ЛЕС</span></div>
+            <div class="stat">⚠️ МОНСТРОВ: <span id="bugCounter">0</span>/<span id="maxBugs">15</span></div>
+            <div class="stat">🌊 ВОЛНА: <span id="waveNum">1</span> | УБИТО: <span id="waveKills">0</span>/<span id="waveTarget">15</span></div>
+            <div class="wave-bar"><div class="wave-progress" id="waveProgress"></div></div>
+            <div class="stat">⚡ СКОРОСТЬ: <span id="spawnSpeed">1.8</span>с | БОНУС: +<span id="waveBonus">0</span>%</div>
+            <div class="stat">💪 МНОЖИТЕЛЬ HP: x<span id="hpMult">1.00</span> | ☠️ ЯД: <span id="poisonDmg">0</span></div>
+            <div class="stat" id="waveStatus" style="background:#2a1a0a;">⚔️ БОЙ</div>
+            <div id="nukeStatusContainer" style="display:none;">
+                <div class="stat" style="background:#4a0000;">💣 ЯДЕРКА ИСПОЛЬЗОВАНА В ЭТОЙ ВОЛНЕ</div>
+            </div>
+            <div id="bossTimerContainer" style="display:none;">
+                <div class="stat" style="background:#4a0000;">⏱️ ТАЙМЕР БОССА: <span id="bossTimer">90</span>с</div>
+                <div class="boss-timer-bar"><div class="boss-timer-progress" id="bossTimerProgress"></div></div>
+            </div>
+            
+            <div class="tab-buttons">
+                <button id="tabArtifactBtn" class="tab-btn active">🎁 АРТЕФАКТЫ</button>
+                <button id="tabGachaBtn" class="tab-btn">🎰 СЛОТЫ</button>
+                <button id="tabStatsBtn" class="tab-btn">📊 СТАТЫ</button>
+            </div>
+            
+            <div id="artifactPanel"><div id="artifactShop"></div></div>
+            <div id="gachaPanel" style="display:none;">
+                <div class="slot-machine">
+                    <div class="slot-reels">
+                        <div class="slot-reel">
+                            <span class="slot-reel-value" id="reel1value">🔵</span>
+                            <div class="slot-reel-label">РЕДКОСТЬ</div>
+                        </div>
+                        <div class="slot-reel">
+                            <span class="slot-reel-value" id="reel2value">💪</span>
+                            <div class="slot-reel-label">КАТЕГОРИЯ</div>
+                        </div>
+                        <div class="slot-reel">
+                            <span class="slot-reel-value" id="reel3value">✨</span>
+                            <div class="slot-reel-label">ПРЕДМЕТ</div>
+                        </div>
+                    </div>
+                    <div class="slot-buttons">
+                        <button id="slot1Btn">🎰 1 КРУТКА (<span id="slot1Price">100</span>)</button>
+                        <button id="slot3Btn">🎰 3 КРУТКИ (<span id="slot3Price">270</span>)</button>
+                        <button id="slot5Btn">🎰 5 КРУТОК (<span id="slot5Price">400</span>)</button>
+                    </div>
+                    <div class="slot-result" id="slotResult">✨ Нажми на кнопку! ✨</div>
+                </div>
+            </div>
+            
+            <div id="statsPanel" style="display:none;">
+                <h4>📊 ХАРАКТЕРИСТИКИ</h4>
+                <div class="stats-grid" id="statsDisplay"></div>
+                <h4>📦 ИНВЕНТАРЬ</h4>
+                <div id="inventoryList" style="max-height:250px;overflow-y:auto;"></div>
+            </div>
+            
+            <h4>📊 БОЙ</h4>
+            <div class="stat">🔨 Кликов: <span id="statClicks">0</span> | 💀 Убито: <span id="statBugs">0</span></div>
+            <div class="stat">😈 Боссов: <span id="bossKills">0</span> | 🎰 Круток: <span id="gachaCount">0</span></div>
+            <div class="stat">⏱️ Время: <span id="gameTime">0</span>с</div>
+        </div>
+    </div>
+
+    <script src="js/game.js"></script>
+</body>
+</html>
